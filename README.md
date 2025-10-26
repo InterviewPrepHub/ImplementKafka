@@ -5,16 +5,18 @@
 ### requirements:
 
 ### topic management -
-- create & delete topic
+- singleton
+- create & delete topic (CRUD for topic)
 - topic can have multiple partition
 
 ### producer API
 - publish message to specified topic
 - partition selection based on key.hashcode % partition_count(random hash)
+- key is part of message payload
 
 ### consumer API
 - subscribe and unsubscribe  from topics
-- poll for messages on subscribed topic
+- poll for messages on partition index of the subscribed topic
 - maintain offset tracking per consumer
 
 ### message ordering

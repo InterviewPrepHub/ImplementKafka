@@ -30,7 +30,7 @@ public class Consumer {
 
         // Initialize offset for all partitions to 0
         offsets.putIfAbsent(topicName, new ConcurrentHashMap<>());
-        Map<Integer, Long> topicOffsets = offsets.get(topicName);
+        Map<Integer, Long> topicOffsets = offsets.get(topicName);   //partitionIndex -> offset
         for (Partition p : topic.getPartitions()) {
             topicOffsets.putIfAbsent(p.getIndex(), 0L);
         }
