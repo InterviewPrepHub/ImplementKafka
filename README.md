@@ -33,33 +33,34 @@ and use the right data structures
 ### Relational-style schema of entities and their relationships
 
 Relationship between components:
-•	Topic (1) ────< (N) Partition   [Manages list of partitions]
-•	Partition (1) ────< (N) Message     [Manages list of messages]
-•	Consumer (1) ────< (N) Subscription (Topic names)   [Manages list of topics]
-•	Consumer (1) ────< (N) Offset (per partition)   [Manages list of offsets]
+
+    •	Topic (1) ────< (N) Partition   [Manages list of partitions]
+    •	Partition (1) ────< (N) Message     [Manages list of messages]
+    •	Consumer (1) ────< (N) Subscription (Topic names)   [Manages list of topics]
+    •	Consumer (1) ────< (N) Offset (per partition)   [Manages list of offsets]
+
+#### 1. Topic
 
 
-
-1. Topic
-
-Columns         Type            Description
-topic _id       UUID            primary key
-name            String          unique topic name
-partitions      List            associated partitions
+    Columns         Type            Description
+    topic _id       UUID            primary key
+    name            String          unique topic name
+    partitions      List            associated partitions
 
 
-2. Partition
+#### 2. Partition
 
-Columns         Type            Description
-partition_id    UUID            primary key
-topic_id        UUID            foreign key to topic
-index           Integer         partition number (e.g., 0 to N-1 for a topic)
-messages        Queue           Ordered queue of messages
-offsetCounter   Long            Tracks the next offset to be assigned to a message.
-Also helpful when consumers poll and need to track
-what offset they are at.
 
-Why does a Partition have both index and id?
+    Columns         Type            Description
+    partition_id    UUID            primary key
+    topic_id        UUID            foreign key to topic
+    index           Integer         partition number (e.g., 0 to N-1 for a topic)
+    messages        Queue           Ordered queue of messages
+    offsetCounter   Long            Tracks the next offset to be assigned to a message.
+
+helpful when consumers poll and need to track what offset they are at.
+
+#### * Why does a Partition have both index and id?
 index (int: 0..N-1)
 
 Purpose: routing and array access.
@@ -80,18 +81,19 @@ offsets externally.
 Useful if partitions are exported to dashboards or cross-process APIs, or if topics could be recreated.
 
 
-3. Message
-
-Columns         Type            Description
-message_id      UUID            primary key
-partition_id    UUID            foreign key to partition
-key             String          message key
-payload         String          message value
-timestamp       Long            message timestamp
-offset          Long            message offset within partition
+#### 3. Message
 
 
-Producer:
+    Columns         Type            Description
+    message_id      UUID            primary key
+    partition_id    UUID            foreign key to partition
+    key             String          message key
+    payload         String          message value
+    timestamp       Long            message timestamp
+    offset          Long            message offset within partition
+
+
+#### Producer:
 
 1.  Get Topic via TopicManager.getInstance().getTopic(topicName)
 2.	Pick partition:
@@ -99,7 +101,7 @@ Producer:
       •	else: random number in [0, partitionCount)
 3.	Call: partition.addMessage(key, payload)
 
-Consumer:
+#### Consumer:
 
 1.  Each Consumer instance will:
     •	Subscribe/unsubscribe to one or more topics
@@ -107,7 +109,7 @@ Consumer:
     •	poll(topicName) returns next unread message from any partition
 
 
-What “Producer is stateless” means
+#### What “Producer is stateless” means
 
     *   The Producer doesn’t keep any business state between calls to publish(...).
     *   It doesn’t store offsets, partitions, subscriptions, or per-topic/per-key memory.
